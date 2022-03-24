@@ -1,5 +1,5 @@
 
-<img align="center" alt="Hello!" height="300" width="100"  src="https://user-images.githubusercontent.com/77252882/160010328-b548116b-d483-4467-aaf7-32edd2a5109a.png">
+<img align="center" alt="Hello!" height="300" width="600"  src="https://user-images.githubusercontent.com/77252882/160010328-b548116b-d483-4467-aaf7-32edd2a5109a.png">
 
 
 - 🎮 Criando um jogo, em C, utilizando apenas a API do Windows (Win32). 
