@@ -1,16 +1,17 @@
-#include <stdio.h>
-
 #pragma warning(push, 0)
 #include <windows.h>
 #pragma warning(pop)
 
+#include <stdio.h>
+#include <stdint.h>
 #include "Main.h"
 
 HWND g_GameWindow;
-
 BOOL g_GameIsRunning;
-
 GAMEBITMAP g_FrameDrawer;
+MONITORINFO g_MonitorInfo = { sizeof(MONITORINFO) };
+
+
 
 INT  WinMain(HINSTANCE Instance, HINSTANCE PrevInstance, PSTR CommandLine, INT CmdShow)
 {
@@ -55,6 +56,7 @@ INT  WinMain(HINSTANCE Instance, HINSTANCE PrevInstance, PSTR CommandLine, INT C
         MessageBox(NULL, "Failed to allocate memory!", "Error!", MB_ICONEXCLAMATION | MB_OK);
         goto Exit;
     }
+
 
     MSG Message = { 0 };
 
@@ -120,6 +122,9 @@ DWORD CreateGameWindow(void)
     
     WNDCLASSEX WindowClass = { 0 };
 
+    int MonitorWidth = 0;
+    int MonitorHeight = 0;
+
     WindowClass.cbSize         = sizeof(WNDCLASSEX);
     WindowClass.style          = 0;
     WindowClass.lpfnWndProc    = MainWindowProc;
@@ -128,7 +133,7 @@ DWORD CreateGameWindow(void)
     WindowClass.hInstance      = GetModuleHandle(NULL);
     WindowClass.hIcon          = LoadIcon(NULL, IDI_APPLICATION);
     WindowClass.hCursor        = LoadCursor(NULL, IDI_APPLICATION);
-    WindowClass.hbrBackground  = (HBRUSH)(COLOR_WINDOW + 1);
+    WindowClass.hbrBackground  = CreateSolidBrush(RGB(0xDC,0x14,0x3C));
     WindowClass.lpszMenuName   = NULL;
     WindowClass.lpszClassName  = GAME_NAME "_WINDOWCLASS";
     WindowClass.hIconSm        = LoadIcon(NULL, IDI_APPLICATION);
@@ -160,6 +165,17 @@ DWORD CreateGameWindow(void)
         goto Exit;
     }
 
+ 
+    if (!GetMonitorInfo(MonitorFromWindow(g_GameWindow, MONITOR_DEFAULTTOPRIMARY), &g_MonitorInfo))
+    {
+        Result = ERROR_MONITOR_NO_DESCRIPTOR;
+
+        goto Exit;
+    }
+
+    MonitorWidth = g_MonitorInfo.rcMonitor.right - g_MonitorInfo.rcMonitor.left;
+    MonitorHeight = g_MonitorInfo.rcMonitor.bottom - g_MonitorInfo.rcMonitor.top;
+
 Exit:
 
     return(Result);
@@ -185,7 +201,7 @@ BOOL GameIsAlreadyRunning(void)
 void ProcessPlayerInput(void)
 {
     SHORT ThisKeyIsPressed = GetAsyncKeyState(VK_ESCAPE);
-
+     
     if (ThisKeyIsPressed)
     {
         SendMessage(g_GameWindow, WM_CLOSE, 0, 0);
@@ -194,5 +210,9 @@ void ProcessPlayerInput(void)
 
 void RenderGameGraphics(void)
 {
+    HDC DeviceContext = GetDC(g_GameWindow);
+
+    StretchDIBits(DeviceContext, 0, 0, 100, 100, 0, 0, 100, 100, g_FrameDrawer.MemoryBuffer, &g_FrameDrawer.BitMapInfo, DIB_RGB_COLORS, SRCCOPY);
     
+    ReleaseDC(g_GameWindow, DeviceContext);
 }

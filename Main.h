@@ -2,7 +2,7 @@
 
 #define GAME_NAME   "COOL LITTLE SILLY GAME"
 #define GAME_WIDTH  384
-#define GAME_HEIGHT 216
+#define GAME_HEIGHT 240
 #define GAME_BPP    32
 #define GAME_FRAME_MEMORY_SIZE  (GAME_WIDTH * GAME_HEIGHT * (GAME_BPP / 8))
 
@@ -12,6 +12,15 @@ typedef struct GAMEBITMAP
     void* MemoryBuffer;
 
 } GAMEBITMAP;
+
+typedef struct PIXEL32
+{
+    uint8_t Blue;
+    uint8_t Green;
+    uint8_t Red;
+    uint8_t Alpha;
+
+} PIXEL32;
 
 
 LRESULT CALLBACK MainWindowProc(
