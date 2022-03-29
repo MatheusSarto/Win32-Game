@@ -1,6 +1,8 @@
 #pragma warning(push, 0)
 #include <windows.h>
 #pragma warning(pop)
+#pragma warning(disable: 4668) // Disable Warnings About WIN10, I'm On WIN11 So That's Nothing I Can Do About It :/
+#pragma warning(disable: 28251) // Disable Warning About WinMain Inconsistent, I Think It's Also Releated To WIN10.
 
 #include <stdio.h>
 #include <stdint.h>
@@ -9,13 +11,12 @@
 HWND g_GameWindow;
 BOOL g_GameIsRunning;
 GAMEBITMAP g_FrameDrawer;
-MONITORINFO g_MonitorInfo = { sizeof(MONITORINFO) };
-
+GAME_PERF_DATA g_PerformanceData;
 
 
 INT  WinMain(HINSTANCE Instance, HINSTANCE PrevInstance, PSTR CommandLine, INT CmdShow)
 {
-    //Specifying parameters that are not gonna be used.
+    //Specifying Parameters That Are Not Gonna Be Used.
     UNREFERENCED_PARAMETER(Instance);
 
 	UNREFERENCED_PARAMETER(PrevInstance);
@@ -24,7 +25,7 @@ INT  WinMain(HINSTANCE Instance, HINSTANCE PrevInstance, PSTR CommandLine, INT C
 
 	UNREFERENCED_PARAMETER(CmdShow);
 
-    //Check if some instance of the program is alredy running.
+    //Check If Some Instance Of The Program Is Alredy Running.
     if (GameIsAlreadyRunning() == TRUE)
     {
         MessageBox(NULL, "Another instance of this program is alredy running!", "Error!", MB_ICONEXCLAMATION | MB_OK);
@@ -32,22 +33,23 @@ INT  WinMain(HINSTANCE Instance, HINSTANCE PrevInstance, PSTR CommandLine, INT C
         goto Exit;
     }
 
-    //Ends the program if it cannot be opend.
+    //Ends The Program If It Cannot Be Opend.
     if (CreateGameWindow() != ERROR_SUCCESS)
     {
         goto Exit;
     }
 
+    QueryPerformanceFrequency(&g_PerformanceData.PerfFrequency);
 
-    //Inicialize the global structure used to draw frames.
+    //Inicialize The Global Structure Used To Draw Frames.
     g_FrameDrawer.BitMapInfo.bmiHeader.biSize         = sizeof(g_FrameDrawer.BitMapInfo.bmiHeader);
-    g_FrameDrawer.BitMapInfo.bmiHeader.biWidth        = GAME_WIDTH;
-    g_FrameDrawer.BitMapInfo.bmiHeader.biHeight       = GAME_HEIGHT;
+    g_FrameDrawer.BitMapInfo.bmiHeader.biWidth        = GAME_RES_WIDTH;
+    g_FrameDrawer.BitMapInfo.bmiHeader.biHeight       = GAME_RES_HEIGHT;
     g_FrameDrawer.BitMapInfo.bmiHeader.biBitCount     = GAME_BPP;
     g_FrameDrawer.BitMapInfo.bmiHeader.biCompression  = BI_RGB;
     g_FrameDrawer.BitMapInfo.bmiHeader.biPlanes       = 1;
 
-    //Allocates memory to be used by the structer, if it fails the pointer will be NULL.
+    //Allocates Memory To Be Used By The Structer, If It Fails The Pointer Will Be NULL.
     g_FrameDrawer.MemoryBuffer = VirtualAlloc(NULL, GAME_FRAME_MEMORY_SIZE, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
 
     
@@ -57,16 +59,20 @@ INT  WinMain(HINSTANCE Instance, HINSTANCE PrevInstance, PSTR CommandLine, INT C
         goto Exit;
     }
 
+    //Temp Function Used To Change Buffer Default Collor, So It Does Not Hurt My Eyes. :)
+    memset(g_FrameDrawer.MemoryBuffer, 0x7F, GAME_FRAME_MEMORY_SIZE);
 
     MSG Message = { 0 };
 
     g_GameIsRunning = TRUE;
     
 
-    //Main loop, here's where the game makes it's processes ( can think of it as one in game frame ).
+    //Main Loop, Here's Where The Game Makes It's Processes ( Can Think Of It As One In Game Frame ).
     while (g_GameIsRunning)
     {
-        //Checks for inputs.
+        QueryPerformanceCounter(&g_PerformanceData.FrameStart);
+
+        //Checks For Inputs.
         while (PeekMessage(&Message, g_GameWindow, 0, 0, PM_REMOVE))
         {
             DispatchMessage(&Message);
@@ -76,8 +82,25 @@ INT  WinMain(HINSTANCE Instance, HINSTANCE PrevInstance, PSTR CommandLine, INT C
         ProcessPlayerInput();
 
         RenderGameGraphics();
+        
+        
+        QueryPerformanceCounter(&g_PerformanceData.FrameEnd);
+        g_PerformanceData.ElapsedMicroSecondsPerFrame.QuadPart = g_PerformanceData.FrameEnd.QuadPart - g_PerformanceData.FrameStart.QuadPart;
+        g_PerformanceData.ElapsedMicroSecondsPerFrame.QuadPart *= 1000000;
+        g_PerformanceData.ElapsedMicroSecondsPerFrame.QuadPart /= g_PerformanceData.PerfFrequency.QuadPart;
 
-        Sleep(1);
+        //Sleep(1); 
+
+        g_PerformanceData.TotalFramesRendered++;
+
+        if ( (g_PerformanceData.TotalFramesRendered % AVG_FPS_EVERY_FRAMES) == 0)
+        {
+            char str[64] = { 0 };
+
+            _snprintf_s(str, _countof(str), _TRUNCATE, "Elapsed ms: %lli\n", g_PerformanceData.ElapsedMicroSecondsPerFrame.QuadPart);
+
+            OutputDebugString(str);
+        }
     }
 
 
@@ -86,12 +109,13 @@ Exit:
     return(0);
 }
 
-//Where messages sent by windows will be handled.
+
+//Where Messages Sent By Windows Will Be Handled.
 LRESULT CALLBACK MainWindowProc(
-    _In_ HWND WindowHandle,        // handle to window
-    _In_ UINT Message,        // message identifier
-    _In_ WPARAM wParam,    // first message parameter
-    _In_ LPARAM lParam)    // second message parameter
+    _In_ HWND WindowHandle,        // Handle To Window
+    _In_ UINT Message,        // Message Identifier
+    _In_ WPARAM wParam,    // First Message Parameter
+    _In_ LPARAM lParam)    // Second Message Parameter
 {
     LRESULT Result = 0;  
 
@@ -115,15 +139,12 @@ LRESULT CALLBACK MainWindowProc(
     return (Result);
 }
 
-//Creates the window and inicialize all necessary variables and structs, as well as the global: g_GameWindow.
+//Creates The Window And Inicialize All Necessary Variables And Structs, As Well As The Global: g_GameWindow.
 DWORD CreateGameWindow(void)
 {
     DWORD Result = ERROR_SUCCESS;
     
     WNDCLASSEX WindowClass = { 0 };
-
-    int MonitorWidth = 0;
-    int MonitorHeight = 0;
 
     WindowClass.cbSize         = sizeof(WNDCLASSEX);
     WindowClass.style          = 0;
@@ -138,6 +159,7 @@ DWORD CreateGameWindow(void)
     WindowClass.lpszClassName  = GAME_NAME "_WINDOWCLASS";
     WindowClass.hIconSm        = LoadIcon(NULL, IDI_APPLICATION);
 
+
     if (!RegisterClassEx(&WindowClass))
     {
         Result = GetLastError();
@@ -148,13 +170,14 @@ DWORD CreateGameWindow(void)
     }
 
     g_GameWindow = CreateWindowEx(
-        WS_EX_CLIENTEDGE,
+        0,
         WindowClass.lpszClassName,
         GAME_NAME,
         WS_OVERLAPPEDWINDOW | WS_VISIBLE,
         CW_USEDEFAULT, CW_USEDEFAULT, 640, 480,
         NULL, NULL, GetModuleHandle(NULL), NULL
     );
+
 
     if (g_GameWindow == NULL)
     {
@@ -165,16 +188,39 @@ DWORD CreateGameWindow(void)
         goto Exit;
     }
 
+    g_PerformanceData.MonitorInfo.cbSize = sizeof(MONITORINFO);
  
-    if (!GetMonitorInfo(MonitorFromWindow(g_GameWindow, MONITOR_DEFAULTTOPRIMARY), &g_MonitorInfo))
+    if (!GetMonitorInfo(MonitorFromWindow(g_GameWindow, MONITOR_DEFAULTTOPRIMARY), &g_PerformanceData.MonitorInfo))
     {
         Result = ERROR_MONITOR_NO_DESCRIPTOR;
 
         goto Exit;
     }
 
-    MonitorWidth = g_MonitorInfo.rcMonitor.right - g_MonitorInfo.rcMonitor.left;
-    MonitorHeight = g_MonitorInfo.rcMonitor.bottom - g_MonitorInfo.rcMonitor.top;
+    g_PerformanceData.MonitorWidth = g_PerformanceData.MonitorInfo.rcMonitor.right - g_PerformanceData.MonitorInfo.rcMonitor.left;
+    g_PerformanceData.MonitorHeight = g_PerformanceData.MonitorInfo.rcMonitor.bottom - g_PerformanceData.MonitorInfo.rcMonitor.top;
+     
+
+    if (!SetWindowLongPtr(g_GameWindow, GWL_STYLE, (WS_OVERLAPPEDWINDOW | WS_VISIBLE) & ~WS_OVERLAPPEDWINDOW))
+    {
+        MessageBox(NULL, "Could Not Apply Corret Styles!", "Error!", MB_ICONEXCLAMATION | MB_OK);
+        Result = GetLastError();
+
+        goto Exit;
+    }
+
+    if (!SetWindowPos(
+        g_GameWindow, HWND_TOP, 
+        g_PerformanceData.MonitorInfo.rcMonitor.left, g_PerformanceData.MonitorInfo.rcMonitor.top,
+        g_PerformanceData.MonitorWidth, g_PerformanceData.MonitorHeight,
+        SWP_FRAMECHANGED | SWP_FRAMECHANGED)
+        )
+    {
+        MessageBox(NULL, "Full Screen Mode Could Not Be Inicialized", "Error!", MB_ICONEXCLAMATION | MB_OK);
+        Result = GetLastError();
+
+        goto Exit;
+    }
 
 Exit:
 
@@ -200,7 +246,7 @@ BOOL GameIsAlreadyRunning(void)
 
 void ProcessPlayerInput(void)
 {
-    SHORT ThisKeyIsPressed = GetAsyncKeyState(VK_ESCAPE);
+    int16_t ThisKeyIsPressed = GetAsyncKeyState(VK_ESCAPE);
      
     if (ThisKeyIsPressed)
     {
@@ -210,9 +256,33 @@ void ProcessPlayerInput(void)
 
 void RenderGameGraphics(void)
 {
-    HDC DeviceContext = GetDC(g_GameWindow);
 
-    StretchDIBits(DeviceContext, 0, 0, 100, 100, 0, 0, 100, 100, g_FrameDrawer.MemoryBuffer, &g_FrameDrawer.BitMapInfo, DIB_RGB_COLORS, SRCCOPY);
+    PIXEL32 Pixel = { 0 };
+
+    Pixel.Red   = 0x80;
+    Pixel.Green = 0x00;
+    Pixel.Blue  = 0x80;
+    Pixel.Alpha = 0xff;
     
+
+    for (int x = 0; x < GAME_RES_WIDTH * GAME_RES_HEIGHT; x++)
+    {
+        memcpy_s((PIXEL32*)g_FrameDrawer.MemoryBuffer + x, sizeof(PIXEL32), &Pixel, sizeof(PIXEL32));
+    }
+     
+    HDC DeviceContext = GetDC(g_GameWindow);
+    
+    StretchDIBits(
+        DeviceContext,
+        0, 0,           //Coordinates Where The Image Starts Inside Of The Window.
+        g_PerformanceData.MonitorWidth, g_PerformanceData.MonitorHeight, //Width And Height Of The Window.
+        0, 0,   //Coordinates Where The Rectangle Starts On The Buffer.
+        GAME_RES_WIDTH, GAME_RES_HEIGHT, //Width And Height Of The Source Rectangle.
+        g_FrameDrawer.MemoryBuffer, //Pointer To Image Bits [ Array Of Bytes ].
+        &g_FrameDrawer.BitMapInfo,  //Pointer To a BITMAPINFO.
+        DIB_RGB_COLORS,     //Specifies How Colors Will Be Displayed.
+        SRCCOPY     //Specifies How The Source Rectangle Will Be Copied To The Destination.
+    );
+
     ReleaseDC(g_GameWindow, DeviceContext);
 }
