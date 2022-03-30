@@ -3,6 +3,6 @@
 
 
 - 🎮 Criando um jogo, em C, utilizando apenas a API do Windows (Win32). 
-- ✨ Caso tenho se interessado, siga o repositório, irei continuar o projeto até que eu me sinta satisfeito com o resultado !
+- ✨ Caso tenha se interessado, siga o repositório, irei continuar o projeto até que eu me sinta satisfeito com o resultado !
 - 😎 Quer tentar comigo ? Bem não estarei aceitando aceitando commits nesse repositório, mas você pode baixar o código e altera-lo como quiser! Me manda como está ficando lá no discord para interagirmos! 😁 Sartop😼#1760
   
