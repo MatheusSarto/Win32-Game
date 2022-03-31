@@ -18,9 +18,24 @@
     <ClCompile Include="Main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="WindowConfigs.c">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProcessInputs.c">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameRender.c">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Main.h">
+    <ClInclude Include="FrameRender.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowConfigs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcessInputs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
