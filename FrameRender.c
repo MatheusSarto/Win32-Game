@@ -19,11 +19,30 @@ void RenderGameGraphics(void)
     Pixel.Blue = 0x80;
     Pixel.Alpha = 0xff;
 
+    //These Are The Top Left Coordinates Of The Tile.
+    // 0 <= 0 < 24.
+    // 0 <= 0 < 15.
+    uint16_t XTileCoordinate = 1;
+    uint16_t YTileCoordinate = 14;
 
-    for (int x = 0; x < GAME_RES_WIDTH * GAME_RES_HEIGHT; x++)
+    //(TILE_WIDTH) * (GAME_RES_WIDTH) = Uma Linha Completa De Tiles.
+    //Gets The Bottom Left Coordinate Of The Tile.
+    int32_t StartReenderingCoordinateX = TILE_WIDTH * XTileCoordinate;
+    int32_t StartReenderingCoordinateY = (TILE_HEIGHT * GAME_RES_WIDTH) * YTileCoordinate;
+    int32_t PixelLine = 0;
+   
+    for (int32_t y = 0; y < TILE_HEIGHT; y++)
     {
-        memcpy_s((PIXEL32*)g_FrameDrawer.MemoryBuffer + x, sizeof(PIXEL32), &Pixel, sizeof(PIXEL32));
+        for (int32_t x = 0; x < TILE_WIDTH; x++)
+        {           
+
+            memset((PIXEL32*)g_FrameDrawer.MemoryBuffer + ((StartReenderingCoordinateY + StartReenderingCoordinateX) + (PixelLine + x))
+                , 0XFF, sizeof(PIXEL32));
+        }
+
+        PixelLine += GAME_RES_WIDTH;
     }
+   
 
     HDC DeviceContext = GetDC(g_GameWindow);
 

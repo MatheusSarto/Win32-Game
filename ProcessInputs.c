@@ -13,4 +13,4 @@ void ProcessPlayerInput(void)
     {
         SendMessage(g_GameWindow, WM_CLOSE, 0, 0);
     }
-}
+} 

@@ -2,7 +2,8 @@
 #include <stdint.h> 
 
 #define GAME_FRAME_MEMORY_SIZE  (GAME_RES_WIDTH * GAME_RES_HEIGHT * (GAME_BPP / 8))
-#define AVG_FPS_EVERY_FRAMES 100
+#define TILE_WIDTH 16
+#define TILE_HEIGHT 16
 
 typedef struct GAMEBITMAP
 {

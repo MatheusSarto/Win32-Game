@@ -25,7 +25,7 @@ INT  WinMain(HINSTANCE Instance, HINSTANCE PrevInstance, PSTR CommandLine, INT C
 	UNREFERENCED_PARAMETER(PrevInstance);
 
 	UNREFERENCED_PARAMETER(CommandLine);
-
+     
 	UNREFERENCED_PARAMETER(CmdShow);
 
     MSG Message = { 0 };
