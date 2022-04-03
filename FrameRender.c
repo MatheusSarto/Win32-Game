@@ -20,10 +20,10 @@ void RenderGameGraphics(void)
     Pixel.Alpha = 0xff;
 
     //These Are The Top Left Coordinates Of The Tile.
-    // 0 <= 0 < 24.
-    // 0 <= 0 < 15.
-    uint16_t XTileCoordinate = 1;
-    uint16_t YTileCoordinate = 14;
+    // X 0 <= 0 < 24.
+    // Y 0 <= 0 < 15.
+    uint16_t XTileCoordinate = 5;
+    uint16_t YTileCoordinate = 10;
 
     //(TILE_WIDTH) * (GAME_RES_WIDTH) = Uma Linha Completa De Tiles.
     //Gets The Bottom Left Coordinate Of The Tile.

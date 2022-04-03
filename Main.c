@@ -30,9 +30,6 @@ INT  WinMain(HINSTANCE Instance, HINSTANCE PrevInstance, PSTR CommandLine, INT C
 
     MSG Message = { 0 };
 
-    int64_t FrameStart = 0;
-    int64_t FrameEnd = 0;
-
 
     //Check If Some Instance Of The Program Is Alredy Running.
     if (GameIsAlreadyRunning() == TRUE)
@@ -76,7 +73,6 @@ INT  WinMain(HINSTANCE Instance, HINSTANCE PrevInstance, PSTR CommandLine, INT C
     //Main Loop, Here's Where The Game Makes It's Processes ( Can Think Of It As One In Game Frame ).
     while (g_GameIsRunning)
     {
-        QueryPerformanceCounter(&FrameStart);
 
         //Checks For Inputs.
         while (PeekMessage(&Message, g_GameWindow, 0, 0, PM_REMOVE))
