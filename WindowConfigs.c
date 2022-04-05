@@ -53,7 +53,7 @@ DWORD CreateGameWindow(void)
     WindowClass.hInstance = GetModuleHandle(NULL);
     WindowClass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
     WindowClass.hCursor = LoadCursor(NULL, IDI_APPLICATION);
-    WindowClass.hbrBackground = CreateSolidBrush(RGB(0xDC, 0x14, 0x3C));
+    WindowClass.hbrBackground = CreateSolidBrush(RGB(0xFF, 0x00, 0xFF));
     WindowClass.lpszMenuName = NULL;
     WindowClass.lpszClassName = GAME_NAME "_WINDOWCLASS";
     WindowClass.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
