@@ -21,7 +21,7 @@
     <ClCompile Include="WindowConfigs.c">
       <Filter>Resource Files</Filter>
     </ClCompile>
-    <ClCompile Include="ProcessInputs.c">
+    <ClCompile Include="Player.c">
       <Filter>Resource Files</Filter>
     </ClCompile>
     <ClCompile Include="FrameRender.c">
@@ -35,7 +35,7 @@
     <ClInclude Include="WindowConfigs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ProcessInputs.h">
+    <ClInclude Include="Player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

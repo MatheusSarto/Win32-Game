@@ -167,12 +167,12 @@
   <ItemGroup>
     <ClCompile Include="FrameRender.c" />
     <ClCompile Include="Main.c" />
-    <ClCompile Include="ProcessInputs.c" />
+    <ClCompile Include="Player.c" />
     <ClCompile Include="WindowConfigs.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FrameRender.h" />
-    <ClInclude Include="ProcessInputs.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="WindowConfigs.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
