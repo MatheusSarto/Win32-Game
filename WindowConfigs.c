@@ -10,7 +10,7 @@ extern BOOL g_GameIsRunning;
 
 
 //Where Messages Sent By Windows Will Be Handled.
-LRESULT CALLBACK MainWindowProc(
+CALLBACK MainWindowProc(
     _In_ HWND WindowHandle,        // Handle To Window
     _In_ UINT Message,        // Message Identifier
     _In_ WPARAM wParam,    // First Message Parameter
@@ -28,9 +28,8 @@ LRESULT CALLBACK MainWindowProc(
         PostQuitMessage(0);
         break;
     }
-
     default:
-    {
+    { 
         Result = DefWindowProc(WindowHandle, Message, wParam, lParam);
     }
 
